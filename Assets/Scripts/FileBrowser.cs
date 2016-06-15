@@ -6,9 +6,7 @@ using UnityEngine.SceneManagement;
 #if thread
 using System.Threading;
 #endif
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 
 
 public class FileBrowser{
@@ -23,34 +21,34 @@ public class FileBrowser{
 	public Color selectedColor = new Color(0.8f,0.8f,0.8f); //the color of the selected file
 	public bool isVisible{	get{	return visible;	}	} //check if the file browser is currently visible
 	//File Options
-	public string searchPattern = "*"; //search pattern used to find files
+	public string searchPattern = "*", path = ""; //search pattern used to find files
 	//Output
-	public FileInfo outputFile; //the selected output file
+	public string outputFile; //the selected output file
 	//Search
 	public bool showSearch = false; //show the search bar
 	public bool searchRecursively = false; //search current folder and sub folders
 //Protected	
 	//GUI
-	protected Vector2 fileScroll=Vector2.zero,folderScroll=Vector2.zero,driveScroll=Vector2.zero;
-	protected Color defaultColor;
-	protected int layout;
-	protected Rect guiSize;
-	protected GUISkin oldSkin;
-	protected bool visible = false;
+	public Vector2 fileScroll=Vector2.zero,folderScroll=Vector2.zero,driveScroll=Vector2.zero;
+	public Color defaultColor;
+	public int layout;
+	public Rect guiSize;
+	public GUISkin oldSkin;
+	public bool visible = false;
 	//Search
-	protected string searchBarString = ""; //string used in search bar
-	protected bool isSearching = false; //do not show the search bar if searching
+	public string searchBarString = ""; //string used in search bar
+	public bool isSearching = false; //do not show the search bar if searching
 	//File Information
-	protected DirectoryInfo currentDirectory;
-	protected FileInformation[] files;
-	protected DirectoryInformation[] directories,drives;
-	protected DirectoryInformation parentDir;
-	protected bool getFiles = true,showDrives=false;
-	protected int selectedFile = -1;
+	public DirectoryInfo currentDirectory;
+	public FileInformation[] files;
+	public DirectoryInformation[] directories,drives;
+	public DirectoryInformation parentDir;
+	public bool getFiles = true,showDrives=false;
+	public int selectedFile = -1;
 	//Threading
-	protected float startSearchTime = 0f;
+	public float startSearchTime = 0f;
 	#if thread
-	protected Thread t;
+	public Thread t;
 	#endif
 	
 	//Constructors
@@ -88,7 +86,8 @@ public class FileBrowser{
 			case 0:
 				GUILayout.BeginHorizontal("box");
 					GUILayout.FlexibleSpace();
-					GUILayout.Label(currentDirectory.FullName);
+                path = currentDirectory.FullName;
+                    GUILayout.Label(currentDirectory.FullName);
 					GUILayout.FlexibleSpace();
 					if(showSearch){
 						drawSearchField();
@@ -121,11 +120,21 @@ public class FileBrowser{
 									defaultColor = GUI.color;
 									GUI.color = selectedColor;
 								}
-								if(files[fi].button()){
-									outputFile = files[fi].fi;
-									selectedFile = fi;
-								}
-								if(selectedFile==fi)
+#if UNITY_EDITOR
+                        if (files[fi].button())
+                        {
+                            outputFile = files[fi].fi.ToString();
+                            selectedFile = fi;
+                        }
+#else
+                        if (files[fi].button())
+                        {
+                            outputFile = path+"\\"+files[fi].fi.ToString();                        
+                            selectedFile = fi;
+                        }
+#endif
+
+                        if (selectedFile==fi)
 									GUI.color = defaultColor;
 							}
 							GUILayout.EndScrollView();
@@ -180,11 +189,20 @@ public class FileBrowser{
 							defaultColor = GUI.color;
 							GUI.color = selectedColor;
 						}
-						if(files[fi].button()){
-							outputFile = files[fi].fi;
-							selectedFile = fi;
-						}
-						if(selectedFile==fi)
+#if UNITY_EDITOR
+                        if (files[fi].button())
+                        {
+                            outputFile = files[fi].fi.ToString();
+                            selectedFile = fi;
+                        }
+#else
+                        if (files[fi].button())
+                        {
+                            outputFile = path+"\\"+files[fi].fi.ToString();
+                            selectedFile = fi;
+                        }
+#endif
+                        if (selectedFile==fi)
 							GUI.color = defaultColor;
 					}
 				}
@@ -207,7 +225,7 @@ public class FileBrowser{
 		return 0;
 	}
 	
-	protected void drawSearchField(){
+	public void drawSearchField(){
 		if(isSearching){
 			GUILayout.Label("Searching For: \""+searchBarString+"\"");
 		}else{
@@ -229,7 +247,7 @@ public class FileBrowser{
 		}
 	}
 	
-	protected void drawSearchMessage(){
+	public void drawSearchMessage(){
 		float tt = Time.time-startSearchTime;
 		if(tt>1)
 			GUILayout.Button("Searching");
@@ -295,7 +313,7 @@ public class FileBrowser{
 		searchFileList(di,fileTexture!=null);
 	}
 	
-	protected void searchFileList(DirectoryInfo di,bool hasTexture){
+	public void searchFileList(DirectoryInfo di,bool hasTexture){
 		//(searchBarString.IndexOf("*") >= 0)?searchBarString:"*"+searchBarString+"*"; //this allows for more intuitive searching for strings in file names
 		FileInfo[] fia = di.GetFiles((searchBarString.IndexOf("*") >= 0)?searchBarString:"*"+searchBarString+"*",(searchRecursively)?SearchOption.AllDirectories:SearchOption.TopDirectoryOnly);
 		files = new FileInformation[fia.Length];
@@ -311,7 +329,7 @@ public class FileBrowser{
 		#endif
 	}
 	
-	protected void threadSearchFileList(object hasTexture){
+	public void threadSearchFileList(object hasTexture){
 		searchFileList(currentDirectory,(bool)hasTexture);
 		isSearching = false;
 	}

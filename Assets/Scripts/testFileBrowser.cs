@@ -14,7 +14,6 @@ public class testFileBrowser : MonoBehaviour {
     FileBrowser fb = new FileBrowser();
 	// Use this for initialization
 	void Start () {
-        GameManager manager = new GameManager();
         type = GameManager.i.getType();
 		//setup file browser style
 		fb.guiSkin = skins[0]; //set the starting skin
@@ -32,7 +31,7 @@ public class testFileBrowser : MonoBehaviour {
         if (returnedValue ==1)
         { //true is returned when a file has been selected
           //the output file is a member if the FileInfo class, if cancel was selected the value is null
-            newFile = (fb.outputFile == null) ? "" : fb.outputFile.ToString();
+            newFile = fb.outputFile;
             if (output.Equals("Nije odabran niti jedan dokument") || type.Equals("Model") || type.Equals("Texture"))
             {
                 output = newFile;
@@ -44,7 +43,6 @@ public class testFileBrowser : MonoBehaviour {
                 {
                     array.Add(newFile);
                 }
-                
             }
             else
             {
@@ -54,17 +52,44 @@ public class testFileBrowser : MonoBehaviour {
         }
         else if (returnedValue == 2)
         {
+
             if (GameManager.i.getType().Equals("Model"))
             {
-                if(array.Count!=0) GameManager.i.setModel(array[0]);
+                string isNull = "";
+                if (array[0] != null)
+                {
+                    isNull = array[0];
+                }
+                GameManager.i.setModel(isNull);
             }
             else if (GameManager.i.getType().Equals("Texture"))
             {
-                if (array.Count != 0) GameManager.i.setTexture(array[0]);
+                string isNull = "";
+                if (array[0] != null)
+                {
+                    isNull = array[0];
+                }
+                if (GameManager.i.getBoth())
+                {
+                    GameManager.i.setArray(new List<string>());
+                }
+                GameManager.i.setTexture(isNull);
             }
             else if (GameManager.i.getType().Equals("Images"))
             {
-                if (array.Count != 0) GameManager.i.setArray(array);
+                if (GameManager.i.getBoth())
+                {
+                    GameManager.i.setTexture("");
+                }
+                foreach (string element in array)
+                {
+                    if (element == null)
+                    {
+                        array.Remove(element);
+                    }
+                }
+
+                GameManager.i.setArray(array);
             }
             SceneManager.LoadScene("LoadObject");
         }

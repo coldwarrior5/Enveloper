@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public string type, modelPath="", texturePath="";
-    List<string> array = new List<string>();
+    private string type, modelPath="", texturePath="";
+    private List<string> array = new List<string>();
     public static GameManager i;
+    private bool both = false;
 
     void Awake()
     {
@@ -59,11 +60,21 @@ public class GameManager : MonoBehaviour
         return texturePath;
     }
 
+    public void setBoth(bool input)
+    {
+        both = input;
+    }
+
+    public bool getBoth()
+    {
+        return both;
+    }
+
     public bool checkContinue()
     {
         if (!modelPath.Equals("") && correctFormat(array, modelPath, "Model") && 
             ((!texturePath.Equals("") && array.Count==0 && correctFormat(array, texturePath, "Texture"))
-            || (array.Count > 2 && !texturePath.Equals("") && correctFormat(array, "", "Images"))))
+            || (array.Count > 0 && texturePath.Equals("") && correctFormat(array, "", "Images"))))
         {
             return true;
         }
@@ -81,6 +92,7 @@ public class GameManager : MonoBehaviour
                 if (!ending.Equals("jpg") && !ending.Equals("png") && !ending.Equals("gif"))
                 {
                     returnValue = false;
+                    break;
                 }
             }
             return returnValue;

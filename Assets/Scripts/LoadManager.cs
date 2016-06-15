@@ -32,7 +32,7 @@ public class LoadManager : MonoBehaviour
             }
             else
             {
-                if (GameManager.i.correctFormat(new List<string>(), GameManager.i.getModel(), "Model"))
+                if (!GameManager.i.correctFormat(new List<string>(), GameManager.i.getModel(), "Model"))
                 {
                     InfoModelHolder.GetComponentInChildren<Text>().text = "Neispravan dokument";
                     InfoModelHolder.SetActive(true);
@@ -41,21 +41,16 @@ public class LoadManager : MonoBehaviour
             if (GameManager.i.getTexture().Equals("") && GameManager.i.getArray().Count != 0)
             {
 
-                if (GameManager.i.getArray().Count < 3)
+               if (!GameManager.i.correctFormat(GameManager.i.getArray(), "", "Images"))
                 {
-                    InfoImagesHolder.GetComponentInChildren<Text>().text = "Trebate učitati minimalno tri slike";
+                    InfoImagesHolder.GetComponentInChildren<Text>().text = "Prihvatljiv format slika: .jpg, .png, .gif";
                     InfoImagesHolder.SetActive(true);
-                }
-                else if (GameManager.i.correctFormat(GameManager.i.getArray(), "", "Images"))
-                {
-                    InfoModelHolder.GetComponentInChildren<Text>().text = "Prihvatljiv format slika: .jpg, .png, .gif";
-                    InfoModelHolder.SetActive(true);
                 }
                 
             }
             else if (!GameManager.i.getTexture().Equals("") && GameManager.i.getArray().Count == 0)
             {
-                if (GameManager.i.correctFormat(new List<string>(), GameManager.i.getTexture(), "Texture"))
+                if (!GameManager.i.correctFormat(new List<string>(), GameManager.i.getTexture(), "Texture"))
                 {
                     InfoTextureHolder.GetComponentInChildren<Text>().text = "Prihvatljiv format teksture: .jpg, .png, .gif";
                     InfoTextureHolder.SetActive(true);
@@ -75,6 +70,7 @@ public class LoadManager : MonoBehaviour
             }
             else
             {
+                GameManager.i.setBoth(true);
                 if (render)
                 {
                     InfoMenuHolder.GetComponentInChildren<Text>().text += " te ne možete učitati teksturu i slike";
@@ -117,6 +113,11 @@ public class LoadManager : MonoBehaviour
 
     public void Return()
     {
+        GameManager.i.setArray(new List<string>());
+        GameManager.i.setModel("");
+        GameManager.i.setTexture("");
+        GameManager.i.setBoth(false);
+        GameManager.i.setType("");
         SceneManager.LoadScene("MainMenu");
     }
 

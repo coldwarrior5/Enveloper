@@ -101,7 +101,6 @@ public class OBJLoader
                     matlList.Add(currentMaterial);
                 }
                 currentMaterial = Resources.Load("Standard") as Material;
-                Material myHighlightMaterial = new Material(Shader.Find("Standard"));
 
                 currentMaterial.name = data;
             }
@@ -352,7 +351,7 @@ public class OBJLoader
         {
             GameObject subObject = new GameObject(obj);
             subObject.transform.parent = parentObject.transform;
-            subObject.transform.localScale = new Vector3(-1, 1, 1);
+            subObject.transform.localScale = new Vector3(1, 1, 1);
             //Create mesh
             Mesh m = new Mesh();
             m.name = obj;

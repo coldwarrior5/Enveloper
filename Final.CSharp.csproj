@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\LoadManager.cs" />
     <Compile Include="Assets\Scripts\MenuManager.cs" />
     <Compile Include="Assets\Scripts\OBJLoader.cs" />
+    <Compile Include="Assets\Scripts\ProjectorBehaviour.cs" />
     <Compile Include="Assets\Scripts\TextureLoader.cs" />
     <Compile Include="Assets\Scripts\testFileBrowser.cs" />
   </ItemGroup>
