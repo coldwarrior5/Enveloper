@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    private string type, modelPath="", texturePath="";
+    private string type, modelPath="", texturePath="", infoMenu = "", infoModel = "", infoImages = "", infoTexture = "";
     private List<string> array = new List<string>();
     public static GameManager i;
     private bool both = false;
@@ -53,6 +53,46 @@ public class GameManager : MonoBehaviour
     public void setTexture(string input)
     {
         texturePath = input;
+    }
+
+    public string getInfoMenu()
+    {
+        return infoMenu;
+    }
+
+    public void setInfoMenu(string input)
+    {
+        infoMenu = input;
+    }
+
+    public string getInfoModel()
+    {
+        return infoModel;
+    }
+
+    public void setInfoModel(string input)
+    {
+        infoModel = input;
+    }
+
+    public string getInfoImages()
+    {
+        return infoImages;
+    }
+
+    public void setInfoImages(string input)
+    {
+        infoImages = input;
+    }
+
+    public string getInfoTexture()
+    {
+        return infoTexture;
+    }
+
+    public void setInfoTexture(string input)
+    {
+        infoTexture = input;
     }
 
     public string getTexture()

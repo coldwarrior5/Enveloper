@@ -14,82 +14,10 @@ public class LoadManager : MonoBehaviour
 
     public void Continue()
     {
-        InfoMenuHolder.SetActive(false);
-        InfoModelHolder.SetActive(false);
-        InfoImagesHolder.SetActive(false);
-        bool render = false;
-
         if (GameManager.i.checkContinue())
         {
             SceneManager.LoadScene("Main scene");
-        }
-        else
-        {
-            if (GameManager.i.getModel().Equals(""))
-            {
-                InfoMenuHolder.GetComponentInChildren<Text>().text = "Morate učitati .obj dokument";
-                render = true;
-            }
-            else
-            {
-                if (!GameManager.i.correctFormat(new List<string>(), GameManager.i.getModel(), "Model"))
-                {
-                    InfoModelHolder.GetComponentInChildren<Text>().text = "Neispravan dokument";
-                    InfoModelHolder.SetActive(true);
-                }
-            }
-            if (GameManager.i.getTexture().Equals("") && GameManager.i.getArray().Count != 0)
-            {
-
-               if (!GameManager.i.correctFormat(GameManager.i.getArray(), "", "Images"))
-                {
-                    InfoImagesHolder.GetComponentInChildren<Text>().text = "Prihvatljiv format slika: .jpg, .png, .gif";
-                    InfoImagesHolder.SetActive(true);
-                }
-                
-            }
-            else if (!GameManager.i.getTexture().Equals("") && GameManager.i.getArray().Count == 0)
-            {
-                if (!GameManager.i.correctFormat(new List<string>(), GameManager.i.getTexture(), "Texture"))
-                {
-                    InfoTextureHolder.GetComponentInChildren<Text>().text = "Prihvatljiv format teksture: .jpg, .png, .gif";
-                    InfoTextureHolder.SetActive(true);
-                }
-            }
-            else if(GameManager.i.getTexture().Equals("") && GameManager.i.getArray().Count == 0)
-            {
-                if (render)
-                {
-                    InfoMenuHolder.GetComponentInChildren<Text>().text += " te morate učitati teksturu ili slike";
-                }
-                else
-                {
-                    InfoMenuHolder.GetComponentInChildren<Text>().text = "Morate učitati teksturu ili slike";
-                    render = true;
-                }
-            }
-            else
-            {
-                GameManager.i.setBoth(true);
-                if (render)
-                {
-                    InfoMenuHolder.GetComponentInChildren<Text>().text += " te ne možete učitati teksturu i slike";
-                    GameManager.i.setArray(new List<string>());
-                    GameManager.i.setTexture("");
-                }
-                else
-                {
-                    InfoMenuHolder.GetComponentInChildren<Text>().text = "Učitajte samo teksturu ili samo slike";
-                    GameManager.i.setArray(new List<string>());
-                    GameManager.i.setTexture("");
-                    render = true;
-                }
-            }
-            if (render)
-            {
-                InfoMenuHolder.SetActive(true);
-            }
-        }
+        } 
     }
 
     public void Model()
@@ -123,9 +51,15 @@ public class LoadManager : MonoBehaviour
 
     void Start()
     {
-        InfoMenuHolder.SetActive(false);
-        InfoModelHolder.SetActive(false);
-        InfoImagesHolder.SetActive(false);
+        InfoMenuHolder.GetComponentInChildren<Text>().text = GameManager.i.getInfoMenu();
+        InfoModelHolder.GetComponentInChildren<Text>().text = GameManager.i.getInfoModel();
+        InfoImagesHolder.GetComponentInChildren<Text>().text = GameManager.i.getInfoImages();
+        InfoTextureHolder.GetComponentInChildren<Text>().text = GameManager.i.getInfoTexture();
+
+        InfoMenuHolder.SetActive(true);
+        InfoModelHolder.SetActive(true);
+        InfoImagesHolder.SetActive(true);
+        InfoTextureHolder.SetActive(true);
         LoadMenuHolder.SetActive(true);
     }
 

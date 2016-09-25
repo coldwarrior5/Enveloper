@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 #if thread
 using System.Threading;
 #endif
@@ -18,7 +19,7 @@ public class FileBrowser{
 	public int layoutType{	get{	return layout;	}	} //returns the current Layout type
 	public Texture2D fileTexture,directoryTexture,backTexture,driveTexture; //textures used to represent file types
 	public GUIStyle backStyle,cancelStyle,selectStyle; //styles used for specific buttons
-	public Color selectedColor = new Color(0.8f,0.8f,0.8f); //the color of the selected file
+	public Color selectedColor = new Color(0.0f,0.6f,0.0f); //the color of the selected file
 	public bool isVisible{	get{	return visible;	}	} //check if the file browser is currently visible
 	//File Options
 	public string searchPattern = "*", path = ""; //search pattern used to find files
@@ -45,14 +46,20 @@ public class FileBrowser{
 	public DirectoryInformation parentDir;
 	public bool getFiles = true,showDrives=false;
 	public int selectedFile = -1;
-	//Threading
-	public float startSearchTime = 0f;
+    //Double clicking
+    private bool one_click = false;
+    private int which = -1;
+    private float timer_for_double_click;
+    private float delay = 0.7f;
+    //Threading
+    public float startSearchTime = 0f;
 	#if thread
 	public Thread t;
-	#endif
-	
-	//Constructors
-	public FileBrowser(string directory,int layoutStyle,Rect guiRect){	currentDirectory = new DirectoryInfo(directory);	layout = layoutStyle;	guiSize = guiRect;	}
+    private int thisOne = -1;
+#endif
+
+    //Constructors
+    public FileBrowser(string directory,int layoutStyle,Rect guiRect){	currentDirectory = new DirectoryInfo(directory);	layout = layoutStyle;	guiSize = guiRect;	}
 	#if (UNITY_IPHONE || UNITY_ANDROID || UNITY_BLACKBERRY || UNITY_WP8)
 		public FileBrowser(string directory,int layoutStyle):this(directory,layoutStyle,new Rect(0,0,Screen.width,Screen.height)){}
 		public FileBrowser(string directory):this(directory,1){}
@@ -116,21 +123,86 @@ public class FileBrowser{
 						}else{
 							fileScroll = GUILayout.BeginScrollView(fileScroll);
 							for(int fi=0;fi<files.Length;fi++){
-								if(selectedFile==fi){
-									defaultColor = GUI.color;
-									GUI.color = selectedColor;
-								}
+								if(selectedFile==fi)
+                                {
+                                    defaultColor = GUI.color;
+                                    if (thisOne == fi)
+                                    {
+                                        GUI.color = selectedColor;
+                                    }
+                                }
 #if UNITY_EDITOR
                         if (files[fi].button())
                         {
                             outputFile = files[fi].fi.ToString();
                             selectedFile = fi;
+                            if (!one_click) // first click no previous clicks
+                            {
+                                
+                                thisOne = -1;
+                                
+                                one_click = true;
+                                timer_for_double_click = Time.time; // save the current time
+                                                                    // do one click things;
+                                which = fi;
+                            }
+                            else
+                            {
+                                one_click = false; // found a double click, now reset
+                                if ( which == fi && (Time.time - timer_for_double_click) < delay)
+                                {
+                                    thisOne = fi;
+                                    which = -1;
+                                    return 1;
+                                }
+                                else if (which != fi)
+                                {
+                                    thisOne = -1;
+                                    which = fi;
+                                    one_click = true;
+                                    timer_for_double_click = Time.time;
+                                }
+                                
+                            }
                         }
 #else
                         if (files[fi].button())
                         {
-                            outputFile = path+"\\"+files[fi].fi.ToString();                        
+#if UNITY_STANDALONE_OSX
+                        
+                        outputFile = path+"/"+files[fi].fi.ToString();
+#else
+                        outputFile = path+"\\"+files[fi].fi.ToString();
+#endif
                             selectedFile = fi;
+                            if (!one_click) // first click no previous clicks
+                            {
+                                
+                                thisOne = -1;
+                                
+                                one_click = true;
+                                timer_for_double_click = Time.time; // save the current time
+                                                                    // do one click things;
+                                which = fi;
+                            }
+                            else
+                            {
+                                one_click = false; // found a double click, now reset
+                                if ( which == fi && (Time.time - timer_for_double_click) < delay)
+                                {
+                                    thisOne = fi;
+                                    which = -1;
+                                    return 1;
+                                }
+                                else if (which != fi)
+                                {
+                                    thisOne = -1;
+                                    which = fi;
+                                    one_click = true;
+                                    timer_for_double_click = Time.time;
+                                }
+                                
+                            }
                         }
 #endif
 
@@ -145,8 +217,6 @@ public class FileBrowser{
                             SceneManager.LoadScene("LoadObject");
                             return 0;
 						}
-						GUILayout.FlexibleSpace();
-						if((selectStyle == null)?GUILayout.Button("Odaberi"):GUILayout.Button("Odaberi",selectStyle)){	return 1;	}
 						GUILayout.FlexibleSpace();
                         if ((selectStyle == null) ? GUILayout.Button("Završi odabir") : GUILayout.Button("Završi odabir", selectStyle)) { return 2; }
                         
@@ -196,11 +266,19 @@ public class FileBrowser{
                             selectedFile = fi;
                         }
 #else
+#if UNITY_STANDALONE_OSX
+                        if (files[fi].button())
+                        {
+                            outputFile = path+"/"+files[fi].fi.ToString();
+                            selectedFile = fi;
+                        }
+#else
                         if (files[fi].button())
                         {
                             outputFile = path+"\\"+files[fi].fi.ToString();
                             selectedFile = fi;
                         }
+#endif
 #endif
                         if (selectedFile==fi)
 							GUI.color = defaultColor;
@@ -208,7 +286,7 @@ public class FileBrowser{
 				}
 				GUILayout.EndScrollView();
 				
-				if((selectStyle == null)?GUILayout.Button("Odaberi"):GUILayout.Button("Odaberi",selectStyle)){	return 1;	}
+				//if((selectStyle == null)?GUILayout.Button("Odaberi"):GUILayout.Button("Odaberi",selectStyle)){	return 1;	}
 				if((cancelStyle == null)?GUILayout.Button("Odustani"):GUILayout.Button("Odustani",cancelStyle)){
                     SceneManager.LoadScene("LoadObject");
                     return 0;
@@ -233,13 +311,13 @@ public class FileBrowser{
 			if(GUILayout.Button("search")){
 				if(searchBarString.Length > 0){
 					isSearching = true;
-					#if thread
+#if thread
 					startSearchTime = Time.time;
 					t = new Thread(threadSearchFileList);
 					t.Start(true);
-					#else
+#else
 					searchFileList(currentDirectory);
-					#endif
+#endif
 				}else{
 					getFileList(currentDirectory);
 				}
@@ -295,9 +373,33 @@ public class FileBrowser{
 			else
 				directories[d] = new DirectoryInformation(dia[d]);
 		}
+
+        //get files
+        FileInfo[] fia;
+        if (GameManager.i.getType().Equals("Model"))
+        {
+            searchPattern = "*.obj";
+            fia = di.GetFiles(searchPattern);
+        }
+        else
+        {
+            searchPattern = "*.jpg";
+            List<FileInfo> backup = new List<FileInfo>(di.GetFiles(searchPattern));
+            searchPattern = "*.png";
+            FileInfo[] find = di.GetFiles(searchPattern);
+            for (int i = 0; i < find.Length; i++)
+            {
+                backup.Add(find[i]);
+            }
+            searchPattern = "*.gif";
+            find = di.GetFiles(searchPattern);
+            for (int i = 0; i < find.Length; i++)
+            {
+                backup.Add(find[i]);
+            }
+            fia = backup.ToArray();
+        }
 		
-		//get files
-		FileInfo[] fia = di.GetFiles(searchPattern);
 		//FileInfo[] fia = searchDirectory(di,searchPattern);
 		files = new FileInformation[fia.Length];
 		for(int f=0;f<fia.Length;f++){
@@ -323,10 +425,10 @@ public class FileBrowser{
 			else
 				files[f] = new FileInformation(fia[f]);
 		}
-		#if thread
-		#else
+#if thread
+#else
 		isSearching = false;
-		#endif
+#endif
 	}
 	
 	public void threadSearchFileList(object hasTexture){

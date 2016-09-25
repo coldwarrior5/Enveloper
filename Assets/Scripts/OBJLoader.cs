@@ -195,7 +195,7 @@ public class OBJLoader
         //CACHE
         Material[] materialCache = null;
         //save this info for later
-        FileInfo OBJFileInfo = new FileInfo(fn);
+        //FileInfo OBJFileInfo = new FileInfo(fn);
          
         foreach (string ln in File.ReadAllLines(fn))
         {
@@ -204,7 +204,7 @@ public class OBJLoader
                 string l = ln.Trim().Replace("  "," ");
                 string[] cmps = l.Split(' ');
                 string data = l.Remove(0, l.IndexOf(' ') + 1);
-
+                /*
                 if (cmps[0] == "mtllib")
                 {
                     //load cache
@@ -212,8 +212,8 @@ public class OBJLoader
                     if (pth != null)
                         materialCache = LoadMTLFile(pth);
 
-                }
-                else if ((cmps[0] == "g" || cmps[0] == "o") && splitByMaterial == false)
+                }*/
+                if ((cmps[0] == "g" || cmps[0] == "o") && splitByMaterial == false)
                 {
                     cmesh = data;
                     if (!objectNames.Contains(cmesh))

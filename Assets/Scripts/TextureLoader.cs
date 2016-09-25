@@ -37,13 +37,13 @@ public class TextureLoader : MonoBehaviour {
             if (DXTType == 49)
             {
                 textureFormat = TextureFormat.DXT1;
-                //	Debug.Log ("DXT1");
+               
             }
 
             if (DXTType == 53)
             {
                 textureFormat = TextureFormat.DXT5;
-                //	Debug.Log ("DXT5");
+                
             }
             int DDS_HEADER_SIZE = 128;
             byte[] dxtBytes = new byte[ddsBytes.Length - DDS_HEADER_SIZE];
@@ -59,7 +59,6 @@ public class TextureLoader : MonoBehaviour {
         }
         catch (System.Exception)
         {
-            Debug.LogError("Error: Could not load DDS");
             return new Texture2D(8, 8);
         }
     }

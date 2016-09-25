@@ -40,11 +40,16 @@ public class MenuManager : MonoBehaviour
 
     void Awake()
     {
+        GameManager.i.setInfoMenu("Morate učitati model te slike ili UV mapu");
+        GameManager.i.setInfoModel("Moguće učitati samo jedan model");
+        GameManager.i.setInfoImages("Jedna ili više slika .jpg, .png, ili .gif formata");
+        GameManager.i.setInfoTexture("Jedna UV mapa .jpg, .png, ili .gif formata");
         //check if directory doesn't exit
-        if (!Directory.Exists("Generirane teksture"))
+        string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+        if (!Directory.Exists(path+"\\Oblozitelj"))
         {
             //if it doesn't, create it
-            Directory.CreateDirectory("Generirane teksture");
+            Directory.CreateDirectory(path+"/Oblozitelj");
 
         }
     }

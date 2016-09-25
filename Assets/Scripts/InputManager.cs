@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour {
     public GameObject target;
     private string objPath, texturePath = null;
     private List<string> photoPaths = null;
-
+    public float mMoveSpeed =  2.0f;
     public GameObject ProjectorPrefab;
     private List<GameObject> mProjectors = new List<GameObject>();
 
@@ -21,10 +21,10 @@ public class InputManager : MonoBehaviour {
     {
 
         myDropdown.options.Clear();
-        myDropdown.options.Add(new Dropdown.OptionData() {text = "Spremi" });
+        myDropdown.options.Add(new Dropdown.OptionData() {text = "Spremi UV mapu" });
         myDropdown.options.Add(new Dropdown.OptionData() { text = "Povratak u glavni izbornik" });
-        myDropdown.options.Add(new Dropdown.OptionData() { text = "Ispeci teksturu" });
-        myDropdown.options.Add(new Dropdown.OptionData() { text = "Zatvori" });
+        myDropdown.options.Add(new Dropdown.OptionData() { text = "Ispeci UV mapu" });
+        myDropdown.options.Add(new Dropdown.OptionData() { text = "Zatvori izbornik" });
         myDropdown.value = 3;
         myDropdown.onValueChanged.AddListener(delegate {
             myDropdownValueChangedHandler(myDropdown);
@@ -32,9 +32,7 @@ public class InputManager : MonoBehaviour {
         
         objPath = GameManager.i.getModel();
         texturePath = GameManager.i.getTexture();
-        //Debug.Log(target.GetComponent<Renderer>().bounds);
         target = OBJLoader.LoadOBJFile(objPath);
-        Debug.Log(target.GetComponentInChildren<Renderer>().bounds);
         if (!texturePath.Equals(""))
         {
             WWW www = new WWW("file://"+ texturePath);
@@ -72,6 +70,7 @@ public class InputManager : MonoBehaviour {
         var closer = Input.GetAxis("Mouse ScrollWheel");
         if (target != null)
         {
+            
             if (Input.GetMouseButtonDown(0))
             {
                 mousePosition.x = Input.mousePosition.x;
@@ -86,6 +85,24 @@ public class InputManager : MonoBehaviour {
             {
                 transform.position = Vector3.MoveTowards(transform.position, target.transform.position, closer*3);
             }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                Vector3 newPos = Camera.main.transform.position;
+                newPos.y -= mMoveSpeed*Time.deltaTime;
+                Camera.main.transform.position = newPos;
+                Camera.main.transform.LookAt(target.transform.position);
+            }
+                
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                Vector3 newPos = Camera.main.transform.position;
+                newPos.y += mMoveSpeed * Time.deltaTime;
+                Camera.main.transform.position = newPos;
+                Camera.main.transform.LookAt(target.transform.position);
+            }
+                
+
+            
         }
         
     }
@@ -139,22 +156,24 @@ public class InputManager : MonoBehaviour {
     public void BakeTexture()
     {
         // Mesh info
-        Debug.Log("BakeTexture() was called!");
         int[] indices = target.GetComponentInChildren<MeshFilter>().mesh.GetIndices(0);
         Vector3[] vertices = target.GetComponentInChildren<MeshFilter>().mesh.vertices;
         List<Vector2> UVs = new List<Vector2>();
         target.GetComponentInChildren<MeshFilter>().mesh.GetUVs(0, UVs);
         Vector3[] normals = target.GetComponentInChildren<MeshFilter>().mesh.normals;
-        Debug.Log("Indices size: " + indices.GetLength(0) +
-            ", Vertices size: " + vertices.GetLength(0) +
-            ", UVs size: " + UVs.Count +
-            ", Normals size: " + normals.GetLength(0));
+        
 
         // Create texure
         int texWidth = 1024, texHeight = 1024;
         Texture2D tex = new Texture2D(texWidth, texHeight);
-
-        for (int i = 0; i < indices.GetLength(0); i += 3)
+        for (int x = 0; x < tex.width; ++x)
+        {
+            for (int y = 0; y < tex.height; ++y)
+            {
+                tex.SetPixel(x, y, Color.magenta);
+            }
+        }
+                for (int i = 0; i < indices.GetLength(0); i += 3)
         {
             int i0 = indices[i+0];
             int i1 = indices[i+1];
@@ -262,10 +281,82 @@ public class InputManager : MonoBehaviour {
                 }
             }
         }
+        //Fixing texture triangle borders
+        Texture2D fixedTex = new Texture2D(tex.width, tex.height);
+        for (int x = 0; x < tex.width; ++x)
+        {
+            for (int y = 0; y < tex.height; ++y)
+            {
+                Color newColor = tex.GetPixel(x, y);
+                
+                if (newColor == Color.magenta)
+                {
+                    Color ul = tex.GetPixel(x - 1, y - 1);
+                    Color u = tex.GetPixel(x, y - 1);
+                    Color ur = tex.GetPixel(x + 1, y - 1);
+                    Color l = tex.GetPixel(x - 1, y);
+                    Color r = tex.GetPixel(x + 1, y);
+                    Color dl = tex.GetPixel(x - 1, y + 1);
+                    Color d = tex.GetPixel(x, y + 1);
+                    Color dr = tex.GetPixel(x + 1, y + 1);
 
-        tex.Apply();
-        target.GetComponentInChildren<Renderer>().material.mainTexture = tex;
-        Debug.Log("BakeTexture() is done!");
+                    int count = 0;
+                    Color mixedColors = Color.black;
+                    if(ul != Color.magenta)
+                    {
+                        mixedColors += ul;
+                        count++;
+                    }
+                    if (u != Color.magenta)
+                    {
+                        mixedColors += u;
+                        count++;
+                    }
+                    if (ur != Color.magenta)
+                    {
+                        mixedColors += ur;
+                        count++;
+                    }
+                    if (l != Color.magenta)
+                    {
+                        mixedColors += l;
+                        count++;
+                    }
+                    if (r != Color.magenta)
+                    {
+                        mixedColors += r;
+                        count++;
+                    }
+                    if (dl != Color.magenta)
+                    {
+                        mixedColors += dl;
+                        count++;
+                    }
+                    if (d != Color.magenta)
+                    {
+                        mixedColors += d;
+                        count++;
+                    }
+                    if (dr != Color.magenta)
+                    {
+                        mixedColors += dr;
+                        count++;
+                    }
+                    if( count!= 0)
+                    {
+                        mixedColors /= count;
+                    }
+                    if(mixedColors == Color.black)
+                    {
+                        mixedColors = Color.magenta;
+                    }
+                    newColor = mixedColors;
+                }
+                fixedTex.SetPixel(x, y, newColor);
+            }
+        }
+        fixedTex.Apply();
+        target.GetComponentInChildren<Renderer>().material.mainTexture = fixedTex;
     }
 
     public void Hide()
@@ -308,7 +399,8 @@ public class InputManager : MonoBehaviour {
 
     public static string TextureName(string name)
     {
-        return string.Format("{0}/../Generirane teksture/{1}_{2}.png", Application.dataPath, name, System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm"));
+        string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+        return string.Format(path+"/Oblozitelj/{1}_{2}.png", Application.dataPath, name, System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm"));
     }
 
 }

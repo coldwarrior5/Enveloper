@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ProjectorBehaviour : MonoBehaviour
 {
-    public float mMoveSpeed = 0.1f;
+    public float mMoveSpeed = 1.0f;
     public Texture2D mProjectionTexture;
 
     private GameObject mProjBody;
@@ -31,6 +31,10 @@ public class ProjectorBehaviour : MonoBehaviour
         newLine.SetWidth(0.01f, 0.01f);
         newLine.SetPosition(0, mProjBody.transform.position);
         newLine.SetPosition(1, mTargetBody.transform.position);
+        for (int i = 0; i < mProjBody.transform.childCount; i++)
+        {
+            mProjBody.transform.GetChild(i).GetComponentInChildren<Renderer>().material.mainTexture = mProjectionTexture;
+        }
     }
 
     // Update is called once per frame
@@ -42,18 +46,18 @@ public class ProjectorBehaviour : MonoBehaviour
         {
             // update target position
             Vector3 newPos = mTargetBody.transform.position;
-            if (Input.GetKey(KeyCode.Keypad4))
-                newPos.x -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad6))
-                newPos.x += mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad2))
-                newPos.z -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad8))
-                newPos.z += mMoveSpeed;
-            if (Input.GetKey(KeyCode.KeypadMinus))
-                newPos.y -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.KeypadPlus))
-                newPos.y += mMoveSpeed;
+            if (Input.GetKey(KeyCode.A))
+                newPos.x -= mMoveSpeed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.D))
+                newPos.x += mMoveSpeed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.S))
+                newPos.z -= mMoveSpeed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.W))
+                newPos.z += mMoveSpeed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.F))
+                newPos.y -= mMoveSpeed * Time.deltaTime;
+            if (Input.GetKey(KeyCode.R))
+                newPos.y += mMoveSpeed * Time.deltaTime;
 
             mTargetBody.transform.position = newPos;
             mTargetBody.GetComponentInChildren<Renderer>().material.color = Color.red;
@@ -70,28 +74,34 @@ public class ProjectorBehaviour : MonoBehaviour
         {
             // update target position
             Vector3 newPos = mProjBody.transform.position;
-            if (Input.GetKey(KeyCode.Keypad4))
-                newPos.x -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad6))
-                newPos.x += mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad2))
-                newPos.z -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.Keypad8))
-                newPos.z += mMoveSpeed;
-            if (Input.GetKey(KeyCode.KeypadMinus))
-                newPos.y -= mMoveSpeed;
-            if (Input.GetKey(KeyCode.KeypadPlus))
-                newPos.y += mMoveSpeed;
+            if (Input.GetKey(KeyCode.A))
+                newPos.x -= mMoveSpeed * Time.deltaTime; ;
+            if (Input.GetKey(KeyCode.D))
+                newPos.x += mMoveSpeed * Time.deltaTime; ;
+            if (Input.GetKey(KeyCode.S))
+                newPos.z -= mMoveSpeed * Time.deltaTime; ;
+            if (Input.GetKey(KeyCode.W))
+                newPos.z += mMoveSpeed * Time.deltaTime; ;
+            if (Input.GetKey(KeyCode.F))
+                newPos.y -= mMoveSpeed * Time.deltaTime; ;
+            if (Input.GetKey(KeyCode.R))
+                newPos.y += mMoveSpeed * Time.deltaTime; ;
 
             mProjBody.transform.position = newPos;
-            mProjBody.GetComponentInChildren<Renderer>().material.color = Color.red;
+            for (int i = 0; i< mProjBody.transform.childCount; i++)
+            {
+                mProjBody.transform.GetChild(i).GetComponentInChildren<Renderer>().material.color = Color.red;
+            }
             newLine = mProjBody.GetComponent<LineRenderer>();
             newLine.SetPosition(0, mProjBody.transform.position);
 
         }
         else
         {
-            mProjBody.GetComponentInChildren<Renderer>().material.color = Color.white;
+            for (int i = 0; i < mProjBody.transform.childCount; i++)
+            {
+                mProjBody.transform.GetChild(i).GetComponentInChildren<Renderer>().material.color = Color.white;
+            }
         }
 
         // Picking code
@@ -103,13 +113,11 @@ public class ProjectorBehaviour : MonoBehaviour
             {
                 if (mProjBody.Equals(hit.transform.gameObject))
                 {
-                    Debug.Log("Projector clicked! " + hit.transform.name);
                     mIsPickingProjBody = true;
                     mIsPickingTargetBody = false;
                 }
                 else if (mTargetBody.Equals(hit.transform.gameObject))
                 {
-                    Debug.Log("Projector target clicked! " + hit.transform.name);
                     mIsPickingProjBody = false;
                     mIsPickingTargetBody = true;
                 }
