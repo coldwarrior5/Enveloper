@@ -423,7 +423,7 @@ public class OBJLoader
              m.RecalculateNormals();   
             }
             m.RecalculateBounds();
-            m.Optimize();
+            ;
 
             MeshFilter mf = subObject.AddComponent<MeshFilter>();
             MeshRenderer mr = subObject.AddComponent<MeshRenderer>();

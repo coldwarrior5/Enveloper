@@ -51,6 +51,9 @@ public class InputManager : MonoBehaviour {
         {
             scale = 1.0f / max;
         }
+        if (float.IsPositiveInfinity(scale))
+            scale = 1.0f;
+        //scale = Mathf.Clamp(scale, 0.0001f, 10000);
         target.transform.localScale = new Vector3(scale, scale, scale);
         if (photoPaths.Count != 0)
         {

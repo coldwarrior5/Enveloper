@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{13AC4B6C-38F1-FF5F-CD3B-CE24EFDAA7D0}|">
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/LoadManager.cs">
+    <Files>
+      <File FileName="Assets/Scripts/OBJLoader.cs" Line="426" Column="1" />
+      <File FileName="Assets/Scripts/InputManager.cs" Line="56" Column="11" />
+      <File FileName="Assets/Scripts/LoadManager.cs" Line="32" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>
